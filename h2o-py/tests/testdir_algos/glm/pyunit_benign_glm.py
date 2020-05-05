@@ -12,7 +12,7 @@ def test_benign():
     X = [0, 1, 2, 4, 5, 6, 7, 8, 9, 10]
 
     model = H2OGeneralizedLinearEstimator(family="binomial", alpha=0, Lambda=1e-5)
-    model = H2OGeneralizedLinearEstimator(family="binomial", alpha=0, lambda_=1e-5)
+    model = H2OGeneralizedLinearEstimator(family="binomial", alpha=0, lambda_=1e-5,nfolds=3)
     model.train(x=X, y=Y, training_frame=training_data)
 
     in_names = [training_data.names[i] for i in X]
