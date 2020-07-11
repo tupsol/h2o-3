@@ -10,7 +10,6 @@ import hex.grid.HyperSpaceSearchCriteria.Strategy;
 import water.exceptions.H2OIllegalArgumentException;
 import water.util.PojoUtils;
 
-import java.lang.reflect.Array;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.IntStream;
