@@ -584,11 +584,11 @@ public interface HyperSpaceWalker<MP extends Model.Parameters, C extends HyperSp
           }
           
           do {
-            // generate random indices
+            grouped_params_length = -1;
             for (int i = 0; i < _hyperParamNames.length; i++) {
               if(grouped_params != null && grouped_params.contains(_hyperParamNames[i]) && grouped_params_length == -1) {
                 int index = _random.nextInt(_hyperParams.get(_hyperParamNames[i]).length);
-                grouped_params_length = ((ArrayList) _hyperParams.get(_hyperParamNames[index])[index]).toArray().length;
+                grouped_params_length = ((ArrayList) _hyperParams.get(_hyperParamNames[i])[index]).toArray().length;
                 hyperparamIndices[i] = index;
               } else if(grouped_params != null && grouped_params.contains(_hyperParamNames[i]) && grouped_params_length != -1) {
                 hyperparamIndices[i] = nextGroupedParamIndex(grouped_params_length, _hyperParamNames[i], _hyperParams.get(_hyperParamNames[i]));
@@ -599,6 +599,9 @@ public interface HyperSpaceWalker<MP extends Model.Parameters, C extends HyperSp
             // check for aliases and loop if we've visited this combo before
           } while (_visitedPermutationHashes.contains(integerHash(hyperparamIndices)));
 
+          Object[] a1 = ((ArrayList) _hyperParams.get(_hyperParamNames[0])[hyperparamIndices[0]]).toArray();
+          Object[] a2 = ((ArrayList) _hyperParams.get(_hyperParamNames[1])[hyperparamIndices[1]]).toArray();
+          Object[] a3 = ((ArrayList) _hyperParams.get(_hyperParamNames[2])[hyperparamIndices[2]]).toArray();
           return hyperparamIndices;
         } // nextModel
 
