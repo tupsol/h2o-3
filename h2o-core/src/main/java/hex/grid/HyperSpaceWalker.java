@@ -378,7 +378,13 @@ public interface HyperSpaceWalker<MP extends Model.Parameters, C extends HyperSp
 
         @Override
         public MP nextModelParameters(Model previousModel) {
-          _currentHyperparamIndices = _currentHyperparamIndices != null ? nextModelIndices(_currentHyperparamIndices) : new int[_hyperParamNames.length];
+
+          if (_currentHyperparamIndices == null) {
+            _currentHyperparamIndices = new int[_hyperParamNames.length];
+            _currentHyperparamIndices[0] = -1; // First combination - all 0s, may not be valid
+          }
+          _currentHyperparamIndices = nextModelIndices(_currentHyperparamIndices);
+
           if (_currentHyperparamIndices != null) {
             // Fill array of hyper-values
             Object[] hypers = hypers(_currentHyperparamIndices);
@@ -395,16 +401,15 @@ public interface HyperSpaceWalker<MP extends Model.Parameters, C extends HyperSp
 
         @Override
         public boolean hasNext(Model previousModel) {
-          if (_currentHyperparamIndices == null) {
-            return true;
-          }
-          int[] hyperparamIndices = _currentHyperparamIndices;
-          for (int i = 0; i < hyperparamIndices.length; i++) {
-            if (hyperparamIndices[i] + 1 < _hyperParams.get(_hyperParamNames[i]).length) {
-              return true;
+          if (_currentHyperparamIndices != null) {
+            int[] hyperParamIndicesCopy = new int[_currentHyperparamIndices.length];
+            System.arraycopy(_currentHyperparamIndices, 0, hyperParamIndicesCopy, 0, _currentHyperparamIndices.length);
+            if (nextModelIndices(hyperParamIndicesCopy) == null) {
+              return false;
             }
           }
-          return false;
+          
+          return true;
         }
 
         @Override
@@ -441,7 +446,7 @@ public interface HyperSpaceWalker<MP extends Model.Parameters, C extends HyperSp
           if(_search_criteria._grouped_parameters != null) {
             int grouped_params_array_len = -1;
             Set<String> grouped_params = new HashSet<>(Arrays.asList(_search_criteria._grouped_parameters));
-            for(int index : hyperparamIndices) {
+            for(int index = 0; index < hyperparamIndices.length; index++) {
               if(grouped_params.contains(_hyperParamNames[index])) {
                 int param_index = hyperparamIndices[index];
                 int param_arrlen = ((ArrayList) _hyperParams.get(_hyperParamNames[index])[param_index]).toArray().length;
