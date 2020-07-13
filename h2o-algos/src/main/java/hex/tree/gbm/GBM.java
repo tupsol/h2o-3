@@ -100,24 +100,6 @@ public class GBM extends SharedTree<GBMModel,GBMModel.GBMParameters,GBMModel.GBM
                       DistributionFamily.bernoulli.equals(_parms._distribution) || DistributionFamily.tweedie.equals(_parms._distribution))) {
         error("_monotone_constraints", "Monotone constraints are only supported for Gaussian and Bernoulli distributions, your distribution: " + _parms._distribution + ".");
       }
-
-      if (_origTrain != null && _origTrain != _train) {
-        List<Double> projections = new ArrayList<>();
-        for (int i = 0; i < _origTrain.numCols(); i++) {
-          Vec currentCol = _origTrain.vec(i);
-          if (currentCol.isCategorical()) {
-            double[] actProjection = toEigenArray(currentCol);
-            for (double v : actProjection) {
-              projections.add(v);
-            }
-          }
-        }
-        double[] primitive_projections = new double[projections.size()];
-        for (int i = 0; i < projections.size(); i++) { 
-          primitive_projections[i] = projections.get(i);
-        }
-        _orig_projection_array = primitive_projections;
-      }
     }
 
     switch( _parms._distribution) {
