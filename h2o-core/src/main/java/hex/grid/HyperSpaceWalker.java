@@ -237,10 +237,6 @@ public interface HyperSpaceWalker<MP extends Model.Parameters, C extends HyperSp
       return paramsBuilder.build();
     }
 
-    // todo: Karthik, you need to fix this if there are grouped_parameters in the hyper_parameter.  It should not
-    //  be part of the grid and should not contribute to any new model.  However, you do need to use it to determine the
-    //  number of legal models you can build.  Ummm, you are
-    //  welcome.  Wendy
     protected long computeMaxSizeOfHyperSpace() {
       long work = 0;
       long non_grouped_params_combos = 1;
@@ -379,9 +375,12 @@ public interface HyperSpaceWalker<MP extends Model.Parameters, C extends HyperSp
         @Override
         public MP nextModelParameters(Model previousModel) {
 
+          // First combination - all 0s, may not be valid, so we set
+          // first index to -1 and then call nextModelIndices to determine
+          // the first valid combination of indices
           if (_currentHyperparamIndices == null) {
             _currentHyperparamIndices = new int[_hyperParamNames.length];
-            _currentHyperparamIndices[0] = -1; // First combination - all 0s, may not be valid
+            _currentHyperparamIndices[0] = -1;
           }
           _currentHyperparamIndices = nextModelIndices(_currentHyperparamIndices);
 
@@ -424,9 +423,6 @@ public interface HyperSpaceWalker<MP extends Model.Parameters, C extends HyperSp
          * the entire space has been traversed.
          */
         private int[] nextModelIndices(int[] hyperparamIndices) {
-          // todo: Karthik, if grouped_parameters is in the _hyperParamNames, you need make sure not to use it
-          // todo: in the hyperspace search.  However, you also need to make sure the correct parameter combinations
-          // todo:  are chosen.  Make sure the right sizes arrays are chosen in the grouped_parameters
           // Find the next parm to flip
           int i;
           for (i = 0; i < hyperparamIndices.length; i++) {
@@ -572,9 +568,6 @@ public interface HyperSpaceWalker<MP extends Model.Parameters, C extends HyperSp
          * criteria.
          */
         private int[] nextModelIndices() {
-          //todo: Karthik, you need to change this up if grouped_parameters are found in
-          // todo: _hyperParameters.  If it is not found, everything will go as before.  You will
-          // todo: always look for it at the beginning.  If found, do your magic.  If not, do as before.
           int[] hyperparamIndices =  new int[_hyperParamNames.length];
           
           Set<String> grouped_params = null;
@@ -598,10 +591,7 @@ public interface HyperSpaceWalker<MP extends Model.Parameters, C extends HyperSp
             }
             // check for aliases and loop if we've visited this combo before
           } while (_visitedPermutationHashes.contains(integerHash(hyperparamIndices)));
-
-          Object[] a1 = ((ArrayList) _hyperParams.get(_hyperParamNames[0])[hyperparamIndices[0]]).toArray();
-          Object[] a2 = ((ArrayList) _hyperParams.get(_hyperParamNames[1])[hyperparamIndices[1]]).toArray();
-          Object[] a3 = ((ArrayList) _hyperParams.get(_hyperParamNames[2])[hyperparamIndices[2]]).toArray();
+          
           return hyperparamIndices;
         } // nextModel
 
